@@ -15,8 +15,6 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
     $command = @"
 Set-Location -LiteralPath '$scriptDir'
 & '$scriptPath'
-Write-Host '[INFO] Script finished. Press ENTER to exit.'
-Read-Host
 "@
 
     Start-Process powershell.exe `
@@ -37,15 +35,15 @@ Add-Type -AssemblyName WindowsBase
 Add-Type -AssemblyName System.Drawing
 
 # ---------------- CONFIG ----------------
-$containerName = "volume.hc"
+$containerName = "secrets.hc"
 $mountLetter   = "N:"
 $vcSubFolder   = "VeraCrypt\VeraCrypt-x64.exe"
 $vcSys32       = "VeraCrypt\veracrypt.sys"
 $vcSys64       = "VeraCrypt\veracrypt-x64.sys"
 # ----------------------------------------
 
-$usbDrive = $PWD.Path.Substring(0,2)
-$container = Join-Path $PWD $containerName
+$usbDrive = $PSScriptRoot.Substring(0,2)
+$container = Join-Path $PSScriptRoot $containerName
 
 Write-Host "$(Get-Date -Format 'HH:mm:ss') [INFO] Started"
 Write-Host "$(Get-Date -Format 'HH:mm:ss') [INFO] USB drive: $usbDrive"
@@ -53,16 +51,16 @@ Write-Host "$(Get-Date -Format 'HH:mm:ss') [INFO] USB drive: $usbDrive"
 # ---------- Prepare local VeraCrypt ----------
 $tempDir = Join-Path $env:TEMP "VeraCryptPortable"
 $localVc = Join-Path $tempDir "VeraCrypt-x64.exe"
-$srcVc   = Join-Path $PWD $vcSubFolder
-$srcSys32 = Join-Path $PWD $vcSys32
-$srcSys64 = Join-Path $PWD $vcSys64
+$driveRoot = $PSScriptRoot.Substring(0,3)
+$srcVc = Join-Path $driveRoot $vcSubFolder
+$srcSys32 = Join-Path $driveRoot $vcSys32
+$srcSys64 = Join-Path $driveRoot $vcSys64
 
 $dstSys32 = Join-Path $tempDir "veracrypt.sys"
 $dstSys64 = Join-Path $tempDir "veracrypt-x64.sys"
 
 if (!(Test-Path $srcVc)) {
     Write-Host "[ERROR] VeraCrypt not found on USB"
-    Read-Host
     exit
 }
 
