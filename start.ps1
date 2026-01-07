@@ -298,7 +298,7 @@ do {
     # ---------- Mount job ----------
     $script:MountJob = Start-Job -ScriptBlock {
         param($localVc, $container, $mountLetter, $password)
-        $args = "/v `"$container`" /l $mountLetter /p `"$password`" /q /s"
+	$args = "/v `"$container`" /l $mountLetter /p `"$password`" /cache no /q /s"
         (Start-Process $localVc $args -Wait -PassThru).ExitCode
     } -ArgumentList $localVc, $container, $mountLetter, $script:password
 
@@ -331,7 +331,7 @@ while ($true) {
     Start-Sleep 2
     if (-not (Check-Usb)) {
         Write-Host "$(Get-Date -Format 'HH:mm:ss') [INFO] USB removed → dismounting"
-        Start-Process $localVc "/dismount $mountLetter /secureDesktop y /nowaitdlg y /silent /quit" -Wait
+	Start-Process $localVc "/dismount $mountLetter /force /secureDesktop y /cache no /wipecache /nowaitdlg y /quit" -Wait
         Write-Host "$(Get-Date -Format 'HH:mm:ss') [INFO] Dismounted"
         try {
             Remove-Item -Path $localVc -Force -ErrorAction SilentlyContinue
